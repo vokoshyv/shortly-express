@@ -2,6 +2,8 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var session = require('express-session')
 
 
 var db = require('./app/config');
@@ -22,17 +24,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+// app.use(bodyParser());
+app.use(cookieParser());
+// app.use(session());
 
-app.get('/',
-function(req, res) {
 
-  res.render('index');
-});
+// app.get('/',
+// function(req, res) {
 
-app.get('/create',
-function(req, res) {
-  res.render('index');
-});
+//   res.render('login');
+// });
+
+// app.get('/create',
+// function(req, res) {
+//   res.render('index');
+// });
 
 app.get('/links',
 function(req, res) {
@@ -79,19 +85,51 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
-// app.isAuthenticated = function(req, res, next) {
+app.get('/', function(req, res){
+  util.restrict(req, res, function(){
+    res.render('index');
+  })
+})
 
-//     // do any checks you want to in here
+app.get('/login', function(req, res){
+  res.render('login');
+})
 
-//     // CHECK THE USER STORED IN SESSION FOR A CUSTOM VARIABLE
-//     // you can do this however you want with whatever variables you set up
-//     if (req.user.authenticated)
-//         return next();
+app.get('/signup', function(req, res){
+  res.render('signup');
+})
 
-//     // IF A USER ISN'T LOGGED IN, THEN REDIRECT THEM SOMEWHERE
-//     res.redirect('/login');
-// }
+app.post('/signup', function(req, res){
+  console.log("post request from signup page: ", req);
+  res.cookie('authorized', true);
+  res.redirect('/');
+  res.send();
+})
 
+app.get('/create', function(req, res) {
+  util.restrict(req, res, function(){
+    res.render('index');
+  })
+});
+
+app.get('/links', function(req, res) {
+  util.restrict(req, res, function(){
+    res.render('index');
+  })
+});
+
+// app.get('/', function(req, res){
+//   //if cookie is true{
+//     if(req.session.user){
+//       res.render('index');
+//       next();
+//     } else{
+//       res.render('login');
+//     }
+//   // }
+//   //else {
+//   // }
+// })
 
 
 /************************************************************/
@@ -124,3 +162,7 @@ app.get('/*', function(req, res) {
 
 console.log('Shortly is listening on 4568');
 app.listen(4568);
+
+
+
+
