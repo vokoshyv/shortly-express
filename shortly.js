@@ -42,10 +42,26 @@ app.use(cookieParser());
 
 app.get('/links',
 function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
-  });
+  if (req.cookies.authorized){
+    res.render('index');
+    Links.reset().fetch().then(function(links) {
+      console.log(links.models);
+      res.send(200, links.models);
+    })
+  }
+  else{
+    res.redirect('/login');
+    res.send();
+  };
 });
+
+// app.get('/links',
+// function(req, res) {
+//   Links.reset().fetch().then(function(links) {
+//     console.log(links.models);
+//     res.send(200, links.models);
+//   });
+// });
 
 app.post('/links',
 function(req, res) {
@@ -100,10 +116,10 @@ app.get('/signup', function(req, res){
 })
 
 app.post('/signup', function(req, res){
-  console.log("post request from signup page: ", req);
+  console.log('req.body: ', req.body);
   res.cookie('authorized', true);
   res.redirect('/');
-  res.send();
+  res.send([{username: req.body.username}, {password: req.body.password}]);
 })
 
 app.get('/create', function(req, res) {
