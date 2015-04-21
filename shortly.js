@@ -111,15 +111,73 @@ app.get('/login', function(req, res){
   res.render('login');
 })
 
+app.post('/login', function(req, res){
+  var username = req.body.username;
+  var password = req.body.password;
+
+  new User({username: username, password: password}).fetch().then(function(found){
+    if (found){
+      //direct user to main index file;
+      res.cookie('authorized', true);
+      res.redirect('/');
+      res.send();
+    }
+    else{
+      res.redirect('/login');
+      res.send();
+      //redirect user to login page
+    }
+  })
+
+  // new Link({ url: uri }).fetch().then(function(found) {
+  //   if (found) {
+  //     res.send(200, found.attributes);
+  //   } else {
+  //     util.getUrlTitle(uri, function(err, title) {
+  //       if (err) {
+  //         console.log('Error reading URL heading: ', err);
+  //         return res.send(404);
+  //       }
+
+  //       var link = new Link({
+  //         url: uri,
+  //         title: title,
+  //         base_url: req.headers.origin
+  //       });
+
+  //       link.save().then(function(newLink) {
+  //         Links.add(newLink);
+  //         res.send(200, newLink);
+  //       });
+  //     });
+  //   }
+  // });
+
+
+
+})
+
 app.get('/signup', function(req, res){
   res.render('signup');
 })
 
 app.post('/signup', function(req, res){
-  console.log('req.body: ', req.body);
-  res.cookie('authorized', true);
-  res.redirect('/');
-  res.send([{username: req.body.username}, {password: req.body.password}]);
+  var username = req.body.username;
+  var password = req.body.password;
+
+
+  var user = new User({
+    username: username,
+    password: password
+  })
+
+  user.save().then(function(newUser){
+    Users.add(newUser);
+    res.cookie('authorized', true);
+    res.redirect('/');
+    res.send(200,newUser);
+  })
+
 })
 
 app.get('/create', function(req, res) {
